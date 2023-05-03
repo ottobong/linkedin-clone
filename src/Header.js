@@ -2,8 +2,18 @@ import React from 'react';
 import './Header.css';
 import { BusinessCenterRounded, HomeRounded, NotificationsRounded, Search, SupervisorAccountRounded, TextsmsRounded } from '@mui/icons-material';
 import HeaderOption from './HeaderOption';
+import { useDispatch,  } from 'react-redux';
+import { logout,  } from './features/userSlice';
+import { auth } from './firebase';
 
 function Header() {
+  const dispatch = useDispatch();
+
+  const logoutOfApp = () => {
+    dispatch(logout());
+    auth.signOut();
+  }
+
   return (
     <div className='header'>
 
@@ -16,7 +26,7 @@ function Header() {
         <div className="header__search">
           {/* Search icon */}
           <Search />
-          <input type="text" />
+          <input placeholder='Search' type="text" />
           
         </div>
       </div>
@@ -28,8 +38,11 @@ function Header() {
         <HeaderOption Icon={BusinessCenterRounded} title='Jobs'/>
         <HeaderOption Icon={TextsmsRounded} title='Messaging'/>
         <HeaderOption Icon={NotificationsRounded} title='Notifications'/>
-        <HeaderOption avatar='https://media.licdn.com/dms/image/D4D35AQEZGau_CXBAbA/profile-framedphoto-shrink_100_100/0/1650353307849?e=1683612000&v=beta&t=rbeRcRQHQWZzZKIu_8trtZ93ycsklezjLIVxJe5c1vM' 
-        title='Me'/>
+        <HeaderOption 
+        avatar={true}
+        title='Me'
+        onClick={logoutOfApp}
+        />
       </div>
     </div>
   )
