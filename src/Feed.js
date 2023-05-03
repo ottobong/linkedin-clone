@@ -4,18 +4,35 @@ import { CalendarViewDay, CreateRounded, EventNoteRounded, Image, SubscriptionsR
 import InputOption from './InputOption';
 import Post from './Post';
 import { db } from './firebase';
+import firebase from 'firebase/compat/app'
 
 function Feed() {
+  const [input, setInput] = useState('');
   const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    db.collection('posts').onSnapshot()
+    db.collection('posts').orderBy('timestamp', 'desc').onSnapshot(snapshot => (
+      setPosts(snapshot.docs.map(doc => (
+        {
+          id: doc.id,
+          data: doc.data(),
+        }
+      )))
+    ))
   }, [])
 
   const sendPost = (e) => {
     e.preventDefault();
 
-    
+    db.collection('posts').add({
+      name:'Otto Christopher',
+      description: 'This is a test',
+      message: input,
+      photoUrl: '',
+      timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    setInput('');
   }
 
   return (
@@ -24,8 +41,8 @@ function Feed() {
 
         <div className="feed__input">
           <CreateRounded />
-          <form action="">
-            <input type="text" />
+          <form>
+            <input value={input} onChange={e => setInput(e.target.value)} type="text" />
             <button onClick={sendPost} type='submit'>Send</button>
           </form>
         </div>
@@ -57,15 +74,17 @@ function Feed() {
       </div>
 
       {/* Posts */}
-      {posts.map((post) => (
-        <Post />
+      {posts.map(({id, data: {name, description, message, photoUrl}}) => (
+        <Post 
+          key={id}
+          name={name}
+          description={description}
+          message={message}
+          photoUrl={photoUrl}
+        />
       ))}
 
-      <Post 
-      name='Otto Christopher' 
-      description='This is my description' 
-      message='I built this clone'
-      />
+
       
     </div>
   )
